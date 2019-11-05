@@ -50,7 +50,7 @@ Enjoy :tada:
     export FOO=bar
   ```
 
-3. If you did not use command `locals` call `locals-refresh` to refresh local aliases.
+3. If you did not use command `locals` call `locals refresh` to refresh local aliases.
 
 4. Now you can use alias `up` or variable `FOO` in this directory.
 When you `cd` into another directory, it is unaliased automatically.
@@ -68,9 +68,9 @@ Locals reads the following variables:
 
 ## List of commands
 - `locals` - open `$LOCALS_FILENAME` file in current directory using `$EDITOR`
-- `locals-leave` - open `$LOCALS_LEAVE_FILENAME` file in current directory using `$EDITOR`
-- `locals-refresh` refresh local aliases in current directory
-- `locals-print` print local aliases in current directory
+- `locals leave` - open `$LOCALS_LEAVE_FILENAME` file in current directory using `$EDITOR`
+- `locals refresh` refresh local aliases in current directory
+- `locals print` print local aliases in current directory
 
 ## Goals
 - be easy to use and intuitive
@@ -81,6 +81,7 @@ Locals reads the following variables:
 ## Non-Goals
 - traverse directory tree and look for local aliases in parent directories
 - be replacement for [GNU Make](https://www.gnu.org/software/make/)
+- do magic
 - exceed 100 LOC
 
 ## Disclaimer

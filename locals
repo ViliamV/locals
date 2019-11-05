@@ -29,6 +29,7 @@ function __locals_load() {
     source "$LOCALS_FILENAME"
     [[ -n "$LOCALS_VERBOSE" ]] && __locals_verbose
   fi
+  return 0
 }
 
 function __locals_unload() {
@@ -47,12 +48,14 @@ function __locals_unload() {
     source "$prev_locals_leave"
     [[ -n "$LOCALS_DEBUG" ]] && __locals_info echo "$prev_locals_leave" "executed"
   fi
+  return 0
 }
 
 function __locals_on_enter() {
   __locals_unload
   __locals_load
   [[ -n "$LOCALS_HOOK" ]] && "$LOCALS_HOOK"
+  return 0
 }
 
 function cd() {
@@ -60,13 +63,17 @@ function cd() {
   __locals_on_enter
 }
 
-function locals() { [[ -n "$EDITOR" ]] && "$EDITOR" "$LOCALS_FILENAME" && __locals_on_enter ; }
+function locals() {
+  case $1 in
+    "" | edit) [[ -n "$EDITOR" ]] && "$EDITOR" "$LOCALS_FILENAME" && __locals_on_enter ;;
+    leave) [[ -n "$EDITOR" ]] && "$EDITOR" "$LOCALS_LEAVE_FILENAME" ;;
+    print) [[ -f "$LOCALS_FILENAME" ]] && __locals_verbose ;;
+    refresh) local OLDPWD="$PWD" ; __locals_on_enter ;;
+    *) echo "TODO - sorry for now"
+  esac
+}
+complete -W "edit leave print refresh" locals
 
-function locals-leave() { [[ -n "$EDITOR" ]] && "$EDITOR" "$LOCALS_LEAVE_FILENAME" ; }
-
-function locals-refresh() { local OLDPWD="$PWD" ; __locals_on_enter ; }
-
-function locals-print() { __locals_verbose ; }
 
 # Load locals when sourcing this file
 __locals_load
