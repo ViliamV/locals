@@ -1,33 +1,56 @@
 #!/usr/bin/env bash
 
-LOCALS_NAME="${LOCALS_NAME:-.local-aliases}"
+LOCALS_FILENAME="${LOCALS_FILENAME:-.locals}"
+LOCALS_LEAVE_FILENAME="${LOCALS_LEAVE_FILENAME:-.locals.leave}"
 
-function __locals_parse_aliases_names() {
-  sed -n 's/^alias \([^=]*\)=.*/\1/p' "$1"
-}
+function __locals_parse_aliases_names() { sed -n 's/^alias \([^=]*\)=.*/\1/p' "$1" ; }
+
+function __locals_parse_env_names() { sed -n 's/^export \([^=]*\)=.*/\1/p' "$1" ; }
 
 function __locals_info() {
-  printf "$(tput setaf 8)%s " "${1:-local}"
-  local file="${2:-$LOCALS_NAME}"
-  mapfile -t < <(__locals_parse_aliases_names "$file")
-  printf "$(tput bold)%s$(tput sgr0)\n" "${MAPFILE[*]}"
+  mapfile -t < <("$1" "$2")
+  if [[ ${#MAPFILE[@]} -gt 0 ]]; then
+    printf "$(tput setaf 8)%s " "$3"
+    local IFS=' '
+    printf "$(tput bold)%s$(tput sgr0)\n" "${MAPFILE[*]}"
+  fi
 }
 
+function __locals_env_info() { __locals_info "__locals_parse_env_names" "${1:-$LOCALS_FILENAME}" "${2:-env}" ; }
+
+function __locals_alias_info() { __locals_info "__locals_parse_aliases_names" "${1:-$LOCALS_FILENAME}" "${2:-local}" ; }
+
+function __locals_verbose() { __locals_alias_info ; __locals_env_info ; }
+
+function __locals_debug() { __locals_alias_info "$1" "unalias" ; __locals_env_info "$1" "unset" ; }
+
 function __locals_load() {
-  if [[ -f "$LOCALS_NAME" ]]; then
-    . "$LOCALS_NAME"
-    [[ -n "$LOCALS_VERBOSE" ]] && __locals_info
+  if [[ -f "$LOCALS_FILENAME" ]]; then
+    source "$LOCALS_FILENAME"
+    [[ -n "$LOCALS_VERBOSE" ]] && __locals_verbose
+  fi
+}
+
+function __locals_unload() {
+  local prev_locals="$OLDPWD/$LOCALS_FILENAME"
+  if [[ -f "$prev_locals" ]] ; then
+    for key in $(__locals_parse_aliases_names "$prev_locals"); do
+      unalias "$key" > /dev/null 2>&1
+    done
+    for key in $(__locals_parse_env_names "$prev_locals"); do
+      unset "$key" > /dev/null 2>&1
+    done
+    [[ -n "$LOCALS_DEBUG" ]] && __locals_debug "$prev_locals"
+  fi
+  local prev_locals_leave="$OLDPWD/$LOCALS_LEAVE_FILENAME"
+  if [[ -f "$prev_locals_leave" ]]; then
+    source "$prev_locals_leave"
+    [[ -n "$LOCALS_DEBUG" ]] && __locals_info echo "$prev_locals_leave" "executed"
   fi
 }
 
 function __locals_on_enter() {
-  local prev_aliases="$OLDPWD/$LOCALS_NAME"
-  if [[ -f "$prev_aliases" ]] ; then
-    for key in $(__locals_parse_aliases_names "$prev_aliases"); do
-      unalias "$key" > /dev/null 2>&1
-    done
-    [[ -n "$LOCALS_DEBUG" ]] && __locals_info "unalias" "$prev_aliases"
-  fi
+  __locals_unload
   __locals_load
   [[ -n "$LOCALS_HOOK" ]] && "$LOCALS_HOOK"
 }
@@ -37,20 +60,13 @@ function cd() {
   __locals_on_enter
 }
 
-function locals() {
-  [[ -n "$EDITOR" ]] && "$EDITOR" "$LOCALS_NAME" && __locals_on_enter
-}
+function locals() { [[ -n "$EDITOR" ]] && "$EDITOR" "$LOCALS_FILENAME" && __locals_on_enter ; }
 
-function locals-refresh() {
-  local OLDPWD="$PWD"
-  __locals_on_enter
-}
+function locals-leave() { [[ -n "$EDITOR" ]] && "$EDITOR" "$LOCALS_LEAVE_FILENAME" ; }
 
-function locals-print() {
-  __locals_info
-}
+function locals-refresh() { local OLDPWD="$PWD" ; __locals_on_enter ; }
 
+function locals-print() { __locals_verbose ; }
 
 # Load locals when sourcing this file
 __locals_load
-# vim: ft=sh
