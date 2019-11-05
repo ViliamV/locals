@@ -1,21 +1,22 @@
 #!/usr/bin/env bash
 
-LOCALS_NAME=${LOCALS_NAME:-'.local-aliases'}
+LOCALS_NAME="${LOCALS_NAME:-.local-aliases}"
 
 function __locals_parse_aliases_names() {
   sed -n 's/^alias \([^=]*\)=.*/\1/p' "$1"
 }
 
 function __locals_info() {
-  printf "$(tput setaf 8)%s " "$1"
-  mapfile -t < <(__locals_parse_aliases_names "$2")
+  printf "$(tput setaf 8)%s " "${1:-local}"
+  local file="${2:-$LOCALS_NAME}"
+  mapfile -t < <(__locals_parse_aliases_names "$file")
   printf "$(tput bold)%s$(tput sgr0)\n" "${MAPFILE[*]}"
 }
 
 function __locals_load() {
   if [[ -f "$LOCALS_NAME" ]]; then
     . "$LOCALS_NAME"
-    [[ -n "$LOCALS_VERBOSE" ]] && __locals_info "local" "$LOCALS_NAME"
+    [[ -n "$LOCALS_VERBOSE" ]] && __locals_info
   fi
 }
 
@@ -40,8 +41,16 @@ function locals() {
   [[ -n "$EDITOR" ]] && "$EDITOR" "$LOCALS_NAME" && __locals_on_enter
 }
 
-alias locals-refresh=__locals_on_enter
+function locals-refresh() {
+  local OLDPWD="$PWD"
+  __locals_on_enter
+}
+
+function locals-print() {
+  __locals_info
+}
+
+
+# Load locals when sourcing this file
 __locals_load
-
 # vim: ft=sh
-

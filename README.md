@@ -47,6 +47,11 @@ Locals reads these `ENV` variables.
 | `LOCALS_DEBUG`   | print information about unaliasing when leaving the directory | unset            |
 | `LOCALS_HOOK`    | command that is called after `cd`                             | unset            |
 
+## List of commands
+- `locals` - open `$LOCALS_NAME` file in current directory using `$EDITOR`
+- `locals-refresh` refresh local aliases in current directory
+- `locals-print` print local aliases in current directory
+
 ## Goals
 - be easy to use and intuitive
 - have no dependencies other than [Coreutils](https://www.gnu.org/software/coreutils/)
