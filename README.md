@@ -1,4 +1,7 @@
 # Locals
+[![forthebadge](https://forthebadge.com/images/badges/check-it-out.svg)](https://forthebadge.com)
+[![forthebadge](https://forthebadge.com/images/badges/built-by-developers.svg)](https://forthebadge.com)
+
 Per-directory Bash aliases made easy :balloon:
 
 ## What it does
