@@ -2,26 +2,38 @@
 Per-directory Bash aliases made easy :balloon:
 
 ## What it does
-*Locals* hooks into builtin `cd` command and looks for aliases file (default `.local-aliases`).
-When the file is present, it sources it (loads aliases).
-When you `cd` into another directory, it uses `$OLDPWD` variable to check if previous directory had local aliases.
+*Locals* hooks into builtin `cd` command and looks for a local aliases file (default `.local-aliases`) in the current directory.
+When the file is present it sources it (loads aliases).
+When you `cd` into another directory, it uses `$OLDPWD` variable to check if the previous directory had any local aliases.
 If yes, it unaliases them.
 
 You can extend this functionality using [custom hook](#Customization).
 
 ## Requirements
-- Bash >= 4.4.0
+- Bash ≥ 4.0.0
+- Coreutils
+
+(You probably have both :relieved:)
 
 ## Installation
-1. Clone git repo
+### One-line
   ```sh
-    git clone https://github.com/ViliamV/locals ~/.locals
+  curl https://raw.githubusercontent.com/ViliamV/locals/master/locals --output ~/.locals && \
+  echo "[[ -f ~/.locals ]] && source ~/.locals" >> ~/.bashrc
   ```
-2. Add this to your `.bashrc`
+### Manual
+- Download file using `curl`
   ```sh
-    source ~/.locals/locals
+    curl https://raw.githubusercontent.com/ViliamV/locals/master/locals --output ~/.locals
   ```
-3. Enjoy :tada:
+- Or right-click on [this](https://raw.githubusercontent.com/ViliamV/locals/master/locals) and **Save Link as...** `.locals` in your home directory.
+
+- Add this to your `.bashrc`
+  ```sh
+    source ~/.locals
+  ```
+
+Enjoy :tada:
 
 ## Usage
 1. To create local aliases you can either
@@ -56,7 +68,7 @@ Locals reads these `ENV` variables.
 - be easy to use and intuitive
 - have no dependencies other than [Coreutils](https://www.gnu.org/software/coreutils/)
 - cause no conflicts with Bash builtins
-- be compatible with Bash >=4.4.0
+- be compatible with Bash ≥ 4.0.0
 
 ## Non-Goals
 - traverse directory tree and look for local aliases in parent directories
