@@ -11,7 +11,7 @@ When you `cd` into another directory, it uses `$OLDPWD` variable to check if the
 If yes, *Locals* will `unalias` aliases and `unset` exported variables automatically.
 Any additional "cleanup" is done by executing file `.locals.leave` (if present in the previous directory).
 
-You can add use [custom hook](#Customization) to add even more functionality.
+You can add use [custom hook](#Configuration) to add even more functionality.
 
 ## Requirements
 - Bash ≥ 4.0.0
@@ -55,7 +55,7 @@ Enjoy :tada:
 4. Now you can use alias `up` or variable `FOO` in this directory.
 When you `cd` into another directory, it is unaliased automatically.
 
-## Customization
+## Configuration
 Locals reads the following variables:
 
 | Variable                | Description                                                   | Default         |
