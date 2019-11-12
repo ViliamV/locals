@@ -27,9 +27,8 @@ function __locals_debug() { __locals_alias_info "$1" "unalias" ; __locals_env_in
 function __locals_load() {
   if [[ -f "$LOCALS_FILENAME" ]]; then
     source "$LOCALS_FILENAME"
-    [[ -n "$LOCALS_VERBOSE" ]] && __locals_verbose
+    if [[ -n "$LOCALS_VERBOSE" ]]; then __locals_verbose; fi
   fi
-  return 0
 }
 
 function __locals_unload() {
@@ -41,21 +40,19 @@ function __locals_unload() {
     for key in $(__locals_parse_env_names "$prev_locals"); do
       unset "$key" > /dev/null 2>&1
     done
-    [[ -n "$LOCALS_DEBUG" ]] && __locals_debug "$prev_locals"
+    if [[ -n "$LOCALS_DEBUG" ]]; then __locals_debug "$prev_locals"; fi
   fi
   local prev_locals_leave="$OLDPWD/$LOCALS_LEAVE_FILENAME"
   if [[ -f "$prev_locals_leave" ]]; then
     source "$prev_locals_leave"
-    [[ -n "$LOCALS_DEBUG" ]] && __locals_info echo "$prev_locals_leave" "executed"
+    if [[ -n "$LOCALS_DEBUG" ]]; then __locals_info echo "$prev_locals_leave" "executed"; fi
   fi
-  return 0
 }
 
 function __locals_on_enter() {
   __locals_unload
   __locals_load
-  [[ -n "$LOCALS_HOOK" ]] && "$LOCALS_HOOK"
-  return 0
+  if [[ -n "$LOCALS_HOOK" ]]; then "$LOCALS_HOOK"; fi
 }
 
 function cd() {
@@ -63,16 +60,17 @@ function cd() {
   __locals_on_enter
 }
 
+__locals_arguments="edit edit-leave print refresh"
 function locals() {
   case $1 in
-    "" | edit) [[ -n "$EDITOR" ]] && "$EDITOR" "$LOCALS_FILENAME" && __locals_on_enter ;;
-    leave) [[ -n "$EDITOR" ]] && "$EDITOR" "$LOCALS_LEAVE_FILENAME" ;;
-    print) [[ -f "$LOCALS_FILENAME" ]] && __locals_verbose ;;
+    "" | print) [[ -f "$LOCALS_FILENAME" ]] && __locals_verbose || echo "No $LOCALS_FILENAME file found";;
+    edit) [[ -n "$EDITOR" ]] && "$EDITOR" "$LOCALS_FILENAME" && __locals_on_enter ;;
+    edit-leave) [[ -n "$EDITOR" ]] && "$EDITOR" "$LOCALS_LEAVE_FILENAME" ;;
     refresh) local OLDPWD="$PWD" ; __locals_on_enter ;;
-    *) echo "TODO - sorry for now"
+    *) echo "Unrecognized argument \"$1\". Use one of: $__locals_arguments"
   esac
 }
-complete -W "edit leave print refresh" locals
+complete -W "$__locals_arguments" locals
 
 
 # Load locals when sourcing this file

@@ -11,7 +11,7 @@ When you `cd` into another directory, it uses `$OLDPWD` variable to check if the
 If yes, *Locals* will `unalias` aliases and `unset` exported variables automatically.
 Any additional "cleanup" is done by executing file `.locals.leave` (if present in the previous directory).
 
-You can add use [custom hook](#Configuration) to add even more functionality.
+You can add use [custom hook](#Configuration) to add more functionality.
 
 ## Requirements
 - Bash ≥ 4.0.0
@@ -41,19 +41,21 @@ Enjoy :tada:
 
 ## Usage
 1. To create local aliases you can either
-  - use command `locals` which opens local aliases file in your `$EDITOR`, or
+  - use command `locals edit` which opens local aliases file in your `$EDITOR`, or
   - open local aliases file (default `.locals`) in your editor of choice.
 
-2. Inside the file use standard alias syntax e.g.
+2. File is executed when you enter the directory so enter any shell commands.
   ```sh
+    #!/bin/bash
     alias up='docker-compose up'
     export FOO=bar
+    echo "I have local $FOO"
   ```
 
-3. If you did not use command `locals` call `locals refresh` to refresh local aliases.
+3. If you did not use command `locals edit` call `locals refresh` to refresh local aliases.
 
-4. Now you can use alias `up` or variable `FOO` in this directory.
-When you `cd` into another directory, it is unaliased automatically.
+4. Now you can use alias `up` or variable `$FOO` in this directory.
+When you `cd` into another directory, `up` is unaliased automatically and `$FOO` is unset.
 
 ## Configuration
 Locals reads the following variables:
@@ -67,10 +69,11 @@ Locals reads the following variables:
 | `LOCALS_HOOK`           | command that is called after `cd`                             | unset           |
 
 ## List of commands
-- `locals` - open `$LOCALS_FILENAME` file in current directory using `$EDITOR`
-- `locals leave` - open `$LOCALS_LEAVE_FILENAME` file in current directory using `$EDITOR`
-- `locals refresh` refresh local aliases in current directory
+- `locals` print local aliases in current directory
 - `locals print` print local aliases in current directory
+- `locals edit` - open `$LOCALS_FILENAME` file in current directory using `$EDITOR`
+- `locals edit-leave` - open `$LOCALS_LEAVE_FILENAME` file in current directory using `$EDITOR`
+- `locals refresh` refresh local aliases in current directory
 
 ## Goals
 - be easy to use and intuitive
@@ -79,7 +82,7 @@ Locals reads the following variables:
 - be compatible with Bash ≥ 4.0.0
 
 ## Non-Goals
-- traverse directory tree and look for local aliases in parent directories
+- traverse directory tree and look for .locals files in parent directories
 - be replacement for [GNU Make](https://www.gnu.org/software/make/)
 - do magic
 - exceed 100 LOC
