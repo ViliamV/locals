@@ -1,10 +1,23 @@
-# Locals
 [![forthebadge](https://forthebadge.com/images/badges/built-by-developers.svg)](https://forthebadge.com)
 [![forthebadge](https://forthebadge.com/images/badges/check-it-out.svg)](https://forthebadge.com)
 
-Per-directory Bash aliases and environment variables made easy :balloon:
+*Locals* is a lightweight manager for per-directory bash aliases and environment variables.
 
-## What it does
+## Table of Contents
+- [What it is](#what-it-is)
+- [Requirements](#requirements)
+- [Installation](#installation)
+  - [One-line](#one-line)
+  - [Manual](#manual)
+- [Usage](#usage)
+- [Configuration](#configuration)
+- [List of commands](#list-of-commands)
+- [Goals](#goals)
+- [Non-Goals](#non-goals)
+- [Disclaimer](#disclaimer)
+- [Similar projects](#similar-projects)
+
+## What it is
 *Locals* hooks into builtin `cd` command and looks for `.locals` in the current directory.
 When the file is present it is executed (loads aliases, env variables, etc).
 When you `cd` into another directory, it uses `$OLDPWD` variable to check if the previous directory had `.locals`.
