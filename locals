@@ -56,7 +56,7 @@ function __locals_on_enter() {
 }
 
 function cd() {
-  builtin cd "$@" || exit
+  builtin cd "$@" && \
   __locals_on_enter
 }
 
