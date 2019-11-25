@@ -2,6 +2,9 @@
 
 LOCALS_FILENAME="${LOCALS_FILENAME:-.locals}"
 LOCALS_LEAVE_FILENAME="${LOCALS_LEAVE_FILENAME:-.locals.leave}"
+LOCALS_TEMPLATES="${LOCALS_TEMPLATES:-$HOME/.locals-templates}"
+
+function __locals_copy() { [[ -f "$LOCALS_TEMPLATES/$1" ]] && cp --interactive "$LOCALS_TEMPLATES/$1" "${2:-$LOCALS_FILENAME}" ; }
 
 function __locals_parse_aliases_names() { sed -n 's/^alias \([^=]*\)=.*/\1/p' "$1" ; }
 
@@ -60,18 +63,23 @@ function cd() {
   __locals_on_enter
 }
 
-__locals_arguments="edit edit-leave print refresh"
+__locals_arguments="edit edit-leave print refresh copy copy-leave"
 function locals() {
   case $1 in
     "" | print) [[ -f "$LOCALS_FILENAME" ]] && __locals_verbose || echo "No $LOCALS_FILENAME file found";;
     edit) [[ -n "$EDITOR" ]] && "$EDITOR" "$LOCALS_FILENAME" && __locals_on_enter ;;
     edit-leave) [[ -n "$EDITOR" ]] && "$EDITOR" "$LOCALS_LEAVE_FILENAME" ;;
     refresh) local OLDPWD="$PWD" ; __locals_on_enter ;;
+    copy) __locals_copy "$2" && locals edit ;;
+    copy-leave) __locals_copy "$2" "$LOCALS_LEAVE_FILENAME" && locals edit-leave ;;
     *) echo "Unrecognized argument \"$1\". Use one of: $__locals_arguments"
   esac
 }
 complete -W "$__locals_arguments" locals
 
 
+# Create tempaltes folder + default template
+mkdir -p "$LOCALS_TEMPLATES"
+[[ -f "$LOCALS_TEMPLATES/default" ]] || echo -e "# Example:\nexport FOO=BAR\nalias foo='echo bar'\n\n# vim: ft=sh" > "$LOCALS_TEMPLATES/default"
 # Load locals when sourcing this file
 __locals_load
